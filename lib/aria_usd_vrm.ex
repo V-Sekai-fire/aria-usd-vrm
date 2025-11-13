@@ -7,6 +7,7 @@ defmodule AriaUsdVrm do
   """
 
   alias AriaUsd
+  alias AriaUsdVrm.Parser
   alias Pythonx
   alias Jason
 
