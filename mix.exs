@@ -23,10 +23,11 @@ defmodule AriaUsdVrm.MixProject do
   defp deps do
     [
       {:aria_usd, git: "https://github.com/V-Sekai-fire/aria-usd.git"},
-      {:aria_gltf, git: "https://github.com/V-Sekai-fire/aria-gltf.git"},
+      {:aria_gltf,
+       git: "https://github.com/V-Sekai-fire/aria-gltf.git", branch: "fix/camera-module-aliases"},
+      {:ex_mcp, git: "https://github.com/fire/ex-mcp.git", override: true},
       {:jason, "~> 1.4"},
       {:pythonx, "~> 0.4.0", runtime: false}
     ]
   end
 end
-

@@ -58,6 +58,7 @@ defmodule AriaUsdVrm.Parser do
   alias AriaGltf.Import
   alias AriaGltf.Import.BinaryLoader
   alias Jason
+  alias Pythonx
 
   @type vrm_result ::
           {:ok, map()}
@@ -212,7 +213,7 @@ defmodule AriaUsdVrm.Parser do
   def read_vrm_from_usd(usd_path) when is_binary(usd_path) do
     case File.exists?(usd_path) do
       false ->
-        {:error, "USD file not found: #{usd_path}"
+        {:error, "USD file not found: #{usd_path}"}
 
       true ->
         # Use Pythonx directly for USD operations
@@ -348,7 +349,7 @@ defmodule AriaUsdVrm.Parser do
   def extract_to_temp(vrm_path) when is_binary(vrm_path) do
     case File.exists?(vrm_path) do
       false ->
-        {:error, "VRM file not found: #{vrm_path}"
+        {:error, "VRM file not found: #{vrm_path}"}
 
       true ->
         # Copy GLB file to temporary directory
@@ -510,6 +511,7 @@ defmodule AriaUsdVrm.Parser do
     case load_gltf_json_from_glb(gltf_path) do
       {:ok, json} ->
         Logger.info("✅ Basic JSON parsing succeeded")
+
         {:ok,
          %{
            json: json,
@@ -523,9 +525,11 @@ defmodule AriaUsdVrm.Parser do
            extensions: json["extensions"] || %{}
          }}
 
-      error ->
+      _error ->
         Logger.error("❌ Fallback JSON parsing also failed")
-        {:error, "Both aria-gltf and JSON parsing failed. aria-gltf error: #{inspect(aria_error)}"}
+
+        {:error,
+         "Both aria-gltf and JSON parsing failed. aria-gltf error: #{inspect(aria_error)}"}
     end
   end
 
@@ -551,27 +555,36 @@ defmodule AriaUsdVrm.Parser do
     # Check GLB magic number (0x46546C67 = "glTF" in ASCII)
     <<magic::little-32, version::little-32, length::little-32, rest::binary>> = data
 
-    if magic != 0x46546C67 do
-      {:error, "Invalid GLB magic number: expected 0x46546C67 (glTF), got 0x#{Integer.to_string(magic, 16)}"}
-    elsif version != 2 do
-      {:error, "Unsupported GLB version: expected 2, got #{version}"}
-    elsif length != byte_size(data) do
-      {:error, "GLB length mismatch: header says #{length} bytes, file is #{byte_size(data)} bytes"}
-    elsif byte_size(rest) < 8 do
-      {:error, "GLB too short: no room for first chunk header (need 8 bytes)"}
-    else
-      # Validate first chunk (must be JSON chunk: 0x4E4F534A)
-      <<chunk_length::little-32, chunk_type::little-32, _chunk_data::binary>> = rest
+    cond do
+      magic != 0x46546C67 ->
+        {:error,
+         "Invalid GLB magic number: expected 0x46546C67 (glTF), got 0x#{Integer.to_string(magic, 16)}"}
 
-      if chunk_type != 0x4E4F534A do
-        {:error, "Invalid first chunk type: expected 0x4E4F534A (JSON), got 0x#{Integer.to_string(chunk_type, 16)}"}
-      else
-        :ok
-      end
+      version != 2 ->
+        {:error, "Unsupported GLB version: expected 2, got #{version}"}
+
+      length != byte_size(data) ->
+        {:error,
+         "GLB length mismatch: header says #{length} bytes, file is #{byte_size(data)} bytes"}
+
+      byte_size(rest) < 8 ->
+        {:error, "GLB too short: no room for first chunk header (need 8 bytes)"}
+
+      true ->
+        # Validate first chunk (must be JSON chunk: 0x4E4F534A)
+        <<_chunk_length::little-32, chunk_type::little-32, _chunk_data::binary>> = rest
+
+        if chunk_type != 0x4E4F534A do
+          {:error,
+           "Invalid first chunk type: expected 0x4E4F534A (JSON), got 0x#{Integer.to_string(chunk_type, 16)}"}
+        else
+          :ok
+        end
     end
   rescue
     MatchError ->
       {:error, "Failed to parse GLB header structure"}
+
     e ->
       {:error, "GLB validation error: #{Exception.message(e)}"}
   end
@@ -686,4 +699,3 @@ defmodule AriaUsdVrm.Parser do
     end
   end
 end
-

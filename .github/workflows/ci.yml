@@ -38,7 +38,12 @@ jobs:
         run: mix compile --warnings-as-errors
 
       - name: Run tests
-        run: mix test
+        run: |
+          if [ -d "test" ] && [ "$(ls -A test 2>/dev/null)" ]; then
+            MIX_ENV=test mix test --no-start
+          else
+            echo "No tests found, skipping test step"
+          fi
         env:
           MIX_ENV: test
 
