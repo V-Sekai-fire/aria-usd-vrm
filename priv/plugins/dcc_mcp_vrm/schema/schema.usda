@@ -1,0 +1,52 @@
+#usda 1.0
+(
+    doc = """VRM API Schema for preserving VRM-specific data in USD.
+    
+    This schema stores VRM extensions and metadata to enable round-trip conversion
+    between VRM and USD formats while preserving VRM-specific features like
+    expressions, blendshapes, humanoid bones, and material properties.
+    """
+)
+
+over "GLOBAL" (
+    customData = {
+        string libraryName = "dcc_mcp_vrm"
+        string libraryPath = "priv/plugins/dcc_mcp_vrm"
+    }
+)
+
+class "VrmAPI" (
+    inherits = </APISchemaBase>
+    doc = """API schema for storing VRM-specific data in USD prims.
+    
+    This API can be applied to any prim to store VRM extensions and metadata,
+    enabling preservation of VRM-specific features during USD conversion.
+    """
+    customData = {
+        token[] apiSchemaAutoApplyTo = []
+        string apiSchemaType = "singleApply"
+    }
+)
+{
+    # VRM Version
+    string vrm:version (
+        doc = "VRM format version (0.0 or 1.0)"
+    )
+    
+    # VRM Extensions (stored as JSON string for flexibility)
+    string vrm:extensions (
+        doc = "VRM extensions data as JSON string (extensions.VRM or extensions.VRMC_vrm)"
+    )
+    
+    # VRM Metadata (stored as JSON string)
+    string vrm:metadata (
+        doc = "VRM metadata as JSON string (title, author, humanoid bones, expressions, etc.)"
+    )
+    
+    # Source format indicator
+    string vrm:sourceFormat (
+        doc = "Source format indicator (VRM)"
+        default = "VRM"
+    )
+}
+

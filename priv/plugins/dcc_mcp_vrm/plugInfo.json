@@ -1,0 +1,22 @@
+{
+    "Plugins": [
+        {
+            "Info": {
+                "Types": {
+                    "VrmAPI": {
+                        "bases": ["APISchemaBase"],
+                        "schemaType": "apiSchema",
+                        "schemaKind": "nonAppliedAPI",
+                        "apiSchemaType": "singleApply",
+                        "apiAutoApplyTo": []
+                    }
+                }
+            },
+            "LibraryPath": "@PLUG_INFO_LIBRARY_PATH@",
+            "Name": "dcc_mcp_vrm",
+            "ResourcePath": "@PLUG_INFO_RESOURCE_PATH@",
+            "Root": ".."
+        }
+    ]
+}
+
