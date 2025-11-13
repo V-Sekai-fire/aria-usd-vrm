@@ -221,8 +221,6 @@ defmodule AriaUsdVrm.Parser do
   end
 
   defp read_vrm_schema_from_usd(usd_path) do
-    alias Pythonx
-
     code = """
     import os
     import json
