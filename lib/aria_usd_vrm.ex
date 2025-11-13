@@ -7,7 +7,6 @@ defmodule AriaUsdVrm do
   """
 
   alias AriaUsd
-  alias AriaUsdVrm.Parser
   alias Pythonx
   alias Jason
 
@@ -193,4 +192,3 @@ defmodule AriaUsdVrm do
     e -> {:error, Exception.message(e)}
   end
 end
-
